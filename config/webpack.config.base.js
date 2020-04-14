@@ -28,6 +28,7 @@ module.exports = (config) => {
   configBase = smart(configBase, resolve)
   configBase = smart(configBase, performance)
   
+  console.log(configBase)
   return configBase;
 }
 // module.exports = {

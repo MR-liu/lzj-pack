@@ -1,15 +1,37 @@
 const webpack           = require('webpack');
+
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const { version }       = require('../package.json');
+const webpackConfig     = require('../config/webpack.config.prod');
+const files             = require('../lib/files');
+const absolutepath      = files.getAbsolutepath();
 
-module.exports = ({ config } = {}) => {
+module.exports = (configs) => {
+  const { config = 'webpack.config.js', port, publicPath } = configs;
+
+  console.log(config)
+  const havePersonalizedCustomization = files.directoryExists(`${absolutepath}/${config}`);
+  let personalizedCustomization = {};
+
+  // 检测自定义配置
+  if (!havePersonalizedCustomization) {
+    console.info('未找到个性化配置，启用默认配置。');
+  } else {
+    personalizedCustomization = require(`${absolutepath}/${config}`);
+  }
+
   console.info('Glove[version]:      ', version);
+
+  const prodconfig = webpackConfig({
+    personalizedCustomization,
+    version,
+    port,
+    absolutepath,
+  })
 
   if (config) process.env.gloveConfigPath = config;
 
-  const webpackConfig = require('../config/webpack.config.prod');
-
-  const compiler = webpack(webpackConfig);
+  const compiler = webpack(prodconfig);
 
   const now = () => {
     const time = new Date();

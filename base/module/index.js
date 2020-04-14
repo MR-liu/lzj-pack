@@ -2,7 +2,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 
 module.exports = (config) => {
-  const { personalizedCustomization, absolutepath } = config;
+  const { personalizedCustomization, absolutepath, publicPath } = config;
   const { modules } = personalizedCustomization;
   // console.log(config)
   return {
@@ -21,7 +21,7 @@ module.exports = (config) => {
               limit: 100000,
               esModule: false,
               outputPath: 'img/', // 路径
-              // publicPath: 'http://www.liuzejin.com',
+              publicPath,
             }
           },
           include:  [path.resolve(absolutepath,'./src'), path.resolve(absolutepath,'./public')],

@@ -11,6 +11,7 @@ module.exports = (config) => {
   const { personalizedCustomization, absolutepath } = config;
   const { plugins = [] } = personalizedCustomization;
 
+  console.log(path.join(absolutepath, './public/index.html'))
   return {
     plugins: [ // 数组 所有插件
       ...plugins,
