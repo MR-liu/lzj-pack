@@ -5,11 +5,11 @@ const webpack = require('webpack')
 
 module.exports = (config) => {
   const baseconfig = base(config);
-  const { port, before } = config;
+  const { port, before, devtool } = config;
 
   return smart(baseconfig, {
     mode: 'development',  // 模式 development production
-    devtool: 'source-map',
+    devtool: devtool || 'source-map',
     devServer: { //devserver的配置
       port, //端口
       progress: true, //进度条

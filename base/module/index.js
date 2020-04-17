@@ -41,8 +41,8 @@ module.exports = (config) => {
         {
           test: /\.js$/, // 这就是个normal
           use: 'Happypack/loader?id=js',
-          include:  path.resolve(absolutepath,'./src'),
-          exclude:  path.resolve(absolutepath,'./node_modules')
+          // include:  path.resolve(absolutepath,'./src'),
+          // exclude:  path.resolve(absolutepath,'./node_modules')
         },
         { // css-loader 接续@import这种语法 就是css样式里面可以这样引用其他样式
           test: /\.css$/,

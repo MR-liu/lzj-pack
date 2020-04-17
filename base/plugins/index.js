@@ -1,20 +1,69 @@
-const HTMLWEBPACKPLUGIN    = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const Happypack            = require('happypack');
-const webpack              = require('webpack');
-const path                 = require('path');
+const HTMLWEBPACKPLUGIN      = require('html-webpack-plugin');
+const MiniCssExtractPlugin   = require('mini-css-extract-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const Happypack              = require('happypack');
+const webpack                = require('webpack');
+const path                   = require('path');
 
-const os                   = require("os");
-const happyThreadPool      = Happypack.ThreadPool({ size: os.cpus().length });
+const os                     = require("os");
+const happyThreadPool        = Happypack.ThreadPool({ size: os.cpus().length });
 
 module.exports = (config) => {
   const { personalizedCustomization, absolutepath } = config;
-  const { plugins = [] } = personalizedCustomization;
+  const { plugins = [], template = {}, entry} = personalizedCustomization;
 
-  console.log(path.join(absolutepath, './public/index.html'))
+  if (!entry || !Object.keys(entry).length) {
+    plugins.push(
+      new HTMLWEBPACKPLUGIN({
+        template: path.join(absolutepath, template.template || './public/index.html'),
+        filename: template.filename || 'index.html',
+        showErrors: true,
+        inject: 'body',
+        hash: true,
+        favicon: false,
+        cache: true,
+        chunks: 'all',
+        excludeChunks: [],
+        title: 'demo',
+        xhtml: false,
+        minify: {
+          removeAttributeQuotes: true, // 去除双引号
+          collapseWhitespace: true, // 折叠成一行
+          removeComments: true, // 是否去掉注释
+          minifyJS: true, // 是否压缩html里的js（使用uglify-js进行的压缩）
+          minifyCSS: true, // 是否压缩html里的css（使用clean-css进行的压缩）
+        }
+      }),
+    )
+  }
+
+  for (const key in entry) {
+    plugins.push(
+      new HTMLWEBPACKPLUGIN({
+        template: path.join(absolutepath, entry[key].template || './public/index.html'),
+        filename: `${key}.html` || 'index.html',
+        showErrors: true,
+        inject: 'body',
+        hash: true,
+        favicon: false,
+        cache: true,
+        chunks: 'all',
+        excludeChunks: [],
+        title: 'demo',
+        xhtml: false,
+        minify: {
+          removeAttributeQuotes: true, // 去除双引号
+          collapseWhitespace: true, // 折叠成一行
+          removeComments: true, // 是否去掉注释
+          minifyJS: true, // 是否压缩html里的js（使用uglify-js进行的压缩）
+          minifyCSS: true, // 是否压缩html里的css（使用clean-css进行的压缩）
+        }
+      }),
+    )
+  }
+
   return {
     plugins: [ // 数组 所有插件
-      ...plugins,
       new Happypack({
         id: 'js',
         threadPool: happyThreadPool,
@@ -34,39 +83,12 @@ module.exports = (config) => {
           }
         }]
       }),
-      new HTMLWEBPACKPLUGIN({
-        template: path.join(absolutepath, './public/index.html'),
-        filename: 'index.html',
-        showErrors: true,
-        inject: 'body',
-        hash: true,
-        favicon: false,
-        cache: true,
-        chunks: 'all',
-        excludeChunks: [],
-        title: 'demo',
-        xhtml: false,
-        minify: {
-          removeAttributeQuotes: true, // 去除双引号
-          collapseWhitespace: true, // 折叠成一行
-          removeComments: true, // 是否去掉注释
-          minifyJS: true, // 是否压缩html里的js（使用uglify-js进行的压缩）
-          minifyCSS: true, // 是否压缩html里的css（使用clean-css进行的压缩）
-        }
-      }),
+      
       new MiniCssExtractPlugin({ // 抽离样式
         filename: 'css/main.[hash].css'
       }),
-      // new UglifyJSPlugin({
-      //   uglifyOptions: {
-      //     compress: {
-      //       // warnings: false,
-      //       drop_debugger: false,
-      //       drop_console: true
-      //     }
-      //   }
-      // }),
-      // new CleanWebpackPlugin(),
+
+      new CleanWebpackPlugin(),
       new webpack.BannerPlugin('版权所有'),
       new webpack.IgnorePlugin(/\.\/locale/,/moment/),
       // new webpack.DllReferencePlugin({ // 检索动态库
@@ -74,6 +96,7 @@ module.exports = (config) => {
       // }),
       new webpack.NamedModulesPlugin(), // 打印更新的模块路径
       new webpack.HotModuleReplacementPlugin(), // 热更新插件
+      ...plugins,
     ],
   }
 }

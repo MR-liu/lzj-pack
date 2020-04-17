@@ -65,16 +65,9 @@ module.exports = (configs) => {
     before, // 钩子
   })
 
-  if (proxy && 'object' === typeOf(proxy)) {
+  if (proxy && 'object' === typeOf(proxy) && Object.keys(proxy).length) {
     // console.log(chalk.green('启用代理 ------->', proxy, getProxyMiddlewares, getProxyMiddlewares(proxy)))
     app.use(getProxyMiddlewares(proxy))
-    app.use([
-      () => {
-        return (req, res, next) => {
-          next();
-        }
-      }
-    ])
   }
 
   const complier = webpack(serverconfig);

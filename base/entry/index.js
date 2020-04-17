@@ -16,7 +16,7 @@ module.exports = (config) => {
   }
 
   for (const key in entry) {
-    entry[key] = ['webpack-hot-middleware/client?noInfo=true&reload=true', '@babel/polyfill', path.resolve(absolutepath, entry[key])]
+    entry[key] = ['webpack-hot-middleware/client?noInfo=true&reload=true', '@babel/polyfill', path.resolve(absolutepath, entry[key].entry)]
   }
   
   return { entry };
