@@ -1,6 +1,6 @@
 const proxy = require('lzj-httproxymiddleware');
 
-module.exports = (proxyConfig = {}) => {
+module.exports = (proxyConfig) => {
   if (!proxyConfig) {
     return null;
   }

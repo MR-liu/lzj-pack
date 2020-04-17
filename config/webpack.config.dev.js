@@ -6,28 +6,19 @@ const webpack = require('webpack')
 module.exports = (config) => {
   const baseconfig = base(config);
   const { port, before } = config;
-  console.log(config, port)
+
   return smart(baseconfig, {
     mode: 'development',  // 模式 development production
-    // devtool: 'source-map',
+    devtool: 'source-map',
     devServer: { //devserver的配置
       port, //端口
       progress: true, //进度条
       contentBase: "./build", // 文件夹
       compress: true, // g-zip压缩
       open: true, // 是否自动打开浏览器
-      // proxy: {
-      //   '/api': {
-      //     target: 'http://localhost:3001',
-      //     changeOrigin: true,
-      //     pathRewrite: {
-      //       '^/api': ''
-      //     }
-      //   }
-      // }
       before(app) {
         before && before(app);
-      }
+      },
     },
     watch: false, // run build 的时候监控
     watchOptions: {

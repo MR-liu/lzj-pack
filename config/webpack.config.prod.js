@@ -1,4 +1,4 @@
-const { smart } = require('webpack-merge');
+const { smart }               = require('webpack-merge');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin'); // 压缩
 const TerserJSPlugin          = require('terser-webpack-plugin'); // 这个替换掉uglifyjs-webpack-plugin
 const webpack                 = require('webpack');
@@ -7,9 +7,11 @@ const base                    = require('./webpack.config.base');
 
 module.exports = (config) => {
   const baseconfig = base(config);
+  const { sourcemap } = config;
 
   return smart(baseconfig, {
     mode: 'production',  // 模式 development production
+    devtool: sourcemap || 'source-map',
     optimization: { // 优化项 development下不走
       minimizer: [
         new OptimizeCSSAssetsPlugin({}),

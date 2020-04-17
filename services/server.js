@@ -2,25 +2,34 @@ const express              = require('express');
 const webpack              = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
+const chalk                = require('chalk');
+const timeout              = require('connect-timeout');
 
 const files                = require('../lib/files');
 const absolutepath         = files.getAbsolutepath();
 
 const devconfig            = require('../config/webpack.config.dev');
 const { version }          = require('../package.json');
-const getProxyMiddlewares  = require('../proxy/getProxyMiddlewares')
+const getProxyMiddlewares  = require('../proxy/getProxyMiddlewares');
+const typeOf               = require('../lib/typeOf');
 
-const app                  = express()
+const app                  = express();
+
+// 超时时间
+const TIME_OUT             = 30 * 1e3;
 
 /**
  * @description server
  * @param configs 为注入配置项
  */
 module.exports = (configs) => {
-  const { config = 'webpack.config.js', port, publicPath } = configs;
+  const { config = 'webpack.config.js', proxyConfig = 'proxy.config.js', port, publicPath } = configs;
 
   const havePersonalizedCustomization = files.directoryExists(`${absolutepath}/${config}`);
+  const haveproxyConfig = files.directoryExists(`${absolutepath}/${proxyConfig}`);
+  
   let personalizedCustomization = {};
+  let proxy = {};
 
   // 检测自定义配置
   if (!havePersonalizedCustomization) {
@@ -29,7 +38,16 @@ module.exports = (configs) => {
     personalizedCustomization = require(`${absolutepath}/${config}`);
   }
 
-  const { proxy, defaultRedirect, before } = personalizedCustomization
+  // 检测自定义配置
+  if (!haveproxyConfig) {
+    console.info('未找到个性化配置，启用默认配置。');
+  } else {
+    proxy = require(`${absolutepath}/${proxyConfig}`);
+  }
+
+  
+
+  const { defaultRedirect, before } = personalizedCustomization
 
   const serverOptions = {
     quiet: false,
@@ -47,6 +65,18 @@ module.exports = (configs) => {
     before, // 钩子
   })
 
+  if (proxy && 'object' === typeOf(proxy)) {
+    // console.log(chalk.green('启用代理 ------->', proxy, getProxyMiddlewares, getProxyMiddlewares(proxy)))
+    app.use(getProxyMiddlewares(proxy))
+    app.use([
+      () => {
+        return (req, res, next) => {
+          next();
+        }
+      }
+    ])
+  }
+
   const complier = webpack(serverconfig);
 
   app.use(webpackDevMiddleware(complier, serverOptions));
@@ -56,19 +86,19 @@ module.exports = (configs) => {
     heartbeat: 1000
   }))
 
+  // 设置超时 返回超时响应
+  app.use(timeout(TIME_OUT));
 
-  app.use(getProxyMiddlewares(proxy));
 
   if (defaultRedirect) {
     app.get('/', (req, res) => res.redirect(defaultRedirect));
   }
   
-  console.log('===========================================================', personalizedCustomization)
   app.listen(port, (err) => {
     if (err) {
-      console.error(err);
+      console.error(chalk.red(err));
     } else {
-      console.info('==> 🚧  glove server listening on port %s', port);
+      console.info(chalk.green('==> 🚧  glove server listening on port %s', port));
     }
   });
 }
