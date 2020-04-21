@@ -9,7 +9,7 @@
   "author": {
     "name": "Liu ZeJin"
   },
-  "version": "0.0.4",
+  "version": "0.0.7",
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
@@ -21,6 +21,7 @@
     "@babel/polyfill": "^7.8.7",
     "@babel/preset-env": "^7.8.7",
     "@babel/preset-react": "^7.9.4",
+    "autodll-webpack-plugin": "^0.4.2",
     "autoprefixer": "^9.7.4",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.0.6",
@@ -51,6 +52,7 @@
     "yargs": "^15.3.1"
   },
   "devDependencies": {
-    "@types/yargs": "^15.0.4"
+    "@types/yargs": "^15.0.4",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2"
   }
 }

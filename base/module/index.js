@@ -1,6 +1,20 @@
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 
+const browserslist = [
+  'last 3 versions',
+  'ie >= 9',
+  'ie_mob >= 10',
+  'ff >= 30',
+  'chrome >= 34',
+  'safari >= 6',
+  'opera >= 12.1',
+  'ios >= 6',
+  'android >= 4.4',
+  'bb >= 10',
+  'and_uc 9.9',
+];
+
 module.exports = (config) => {
   const { personalizedCustomization, absolutepath, publicPath } = config;
   const { modules } = personalizedCustomization;
@@ -49,7 +63,16 @@ module.exports = (config) => {
           use: [
             MiniCssExtractPlugin.loader,
             'css-loader',
-            'postcss-loader'
+            {
+              loader: 'postcss-loader',
+              options: {
+                plugins: [
+                  require('autoprefixer')({
+                    browsers: browserslist,
+                  }),
+                ],
+              },
+            }
           ], // style-loader是把css样式插到head标签中 cssloader用于处理样式 顺序 从右向左执行
         },
         {
@@ -58,7 +81,16 @@ module.exports = (config) => {
             MiniCssExtractPlugin.loader,
             'css-loader',
             'less-loader',
-            'postcss-loader',
+            {
+              loader: 'postcss-loader',
+              options: {
+                plugins: [
+                  require('autoprefixer')({
+                    browsers: browserslist,
+                  }),
+                ],
+              },
+            }
           ],
         },
       ]
